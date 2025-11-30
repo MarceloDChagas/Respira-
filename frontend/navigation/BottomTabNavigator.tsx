@@ -77,15 +77,6 @@ export const BottomTabNavigator = () => {
         }}
       />
       <Tab.Screen 
-        name="Add" 
-        component={CalculatorScreen} 
-        options={{
-          tabBarLabel: '',
-          tabBarIcon: ({ color }) => <FontAwesome5 name="plus" size={24} color="white" />,
-          tabBarButton: (props) => <CustomTabBarButton {...props} />,
-        }}
-      />
-      <Tab.Screen 
         name="Shop" 
         component={ShopScreen} 
         options={{

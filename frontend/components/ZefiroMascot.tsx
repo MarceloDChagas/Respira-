@@ -40,6 +40,31 @@ export const ZefiroMascot = () => {
           </View>
         )}
 
+        {/* Accessories: Scarf */}
+        {equippedItems.accessory === 'scarf' && (
+          <View className="absolute top-9 left-1/2 -translate-x-1/2 z-20">
+            <View className="w-10 h-2 bg-teal-600 rounded-md" />
+            <View className="w-3 h-3 bg-teal-700 rounded-b-md ml-6 mt-[-2px]" />
+          </View>
+        )}
+
+        {/* Accessories: Eco Badge */}
+        {equippedItems.accessory === 'eco_badge' && (
+          <View className="absolute top-8 left-2 z-20">
+            <View className="w-4 h-4 bg-green-600 rounded-full" />
+          </View>
+        )}
+
+        {/* Accessories: Solar Hat */}
+        {equippedItems.accessory === 'solar_hat' && (
+          <View className="absolute -top-2 left-[18px] z-20">
+            <View className="w-9 h-5 bg-yellow-400 rounded-t-full" />
+            <View className="absolute -top-2 left-2">
+              <FontAwesome5 name="sun" size={10} color="#d69e2e" />
+            </View>
+          </View>
+        )}
+
         {/* Clouds */}
         <View className="absolute top-2 left-6 w-9 h-9 bg-white rounded-full shadow-sm z-30" />
         <View className="absolute bottom-0 left-0 w-10 h-10 bg-white rounded-full shadow-sm z-20" />

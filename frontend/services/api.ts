@@ -1,9 +1,13 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 
-// Use localhost for web, or specific IP for device if needed. 
-// For Android Emulator use 'http://10.0.2.2:8000'
-// For iOS Simulator use 'http://localhost:8000'
-const API_URL = 'http://192.168.1.101:8000'; 
+// Determina baseURL dinamicamente:
+// 1) Usa variáveis de ambiente Expo se definidas (EXPO_PUBLIC_API_URL)
+// 2) Para Android emulator usa 10.0.2.2
+// 3) Caso contrário localhost
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
 
 const api = axios.create({
   baseURL: API_URL,
@@ -11,6 +15,17 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Interceptor simples para logar erros de rede e facilitar debug
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.code === 'ERR_NETWORK') {
+      console.warn('[API] Network error. baseURL=', API_URL);
+    }
+    return Promise.reject(err);
+  }
+);
 
 export interface CalculationResponse {
   emissions_kg: number;

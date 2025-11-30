@@ -4,26 +4,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { GlassCard } from '../components/GlassCard';
 import { useUserStore } from '../store/userStore';
-import { MISSIONS } from '../constants/missions';
 
 export const MissionsScreen = ({ navigation }: any) => {
-  const { totalPoints, activeMission, acceptMission } = useUserStore();
+  const { totalPoints, missions, activeMission, acceptMission, incrementMission, completeMission } = useUserStore();
 
-  const handleAcceptMission = (mission: typeof MISSIONS[0]) => {
-    if (activeMission) {
-      Alert.alert(
-        "Missão em andamento",
-        "Você já tem uma missão ativa. Termine-a antes de iniciar outra!"
-      );
-      return;
+  const handleAccept = (id: string, title: string) => {
+    acceptMission(id);
+    Alert.alert('Missão aceita', `Você iniciou: ${title}`);
+  };
+
+  const handleProgress = (id: string, missionTitle: string) => {
+    incrementMission(id, 1);
+    const m = missions.find(m => m.id === id);
+    if (m && m.progress + 1 >= m.target) {
+      Alert.alert('Quase lá', 'Progresso completo, clique em Concluir.');
+    } else {
+      Alert.alert('Progresso', `Avanço registrado em: ${missionTitle}`);
     }
-    
-    acceptMission(mission);
-    Alert.alert(
-      "Missão Aceita! 🚀",
-      `Você iniciou a missão: ${mission.title}. Boa sorte!`,
-      [{ text: "OK", onPress: () => navigation.navigate('Home') }]
-    );
+  };
+
+  const handleComplete = (id: string) => {
+    completeMission(id);
+    const m = missions.find(m => m.id === id);
+    Alert.alert('Concluída 🎉', `Você ganhou +${m?.points || 0} pts`);
   };
 
   return (
@@ -36,9 +39,10 @@ export const MissionsScreen = ({ navigation }: any) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} className="space-y-4 pb-10">
-        {MISSIONS.map((mission) => {
-          const isLocked = false; // Future logic for locking hard missions
-          const isActive = activeMission?.id === mission.id;
+        {missions.map((mission) => {
+          const isLocked = mission.locked;
+          const isActive = mission.accepted && !mission.completed;
+          const isCompleted = mission.completed;
           
           // Color mapping
           let bgBadge = 'bg-green-100';
@@ -79,20 +83,53 @@ export const MissionsScreen = ({ navigation }: any) => {
 
                   <View className="flex-row justify-between items-center">
                     <Text className="text-xs font-bold text-teal-600">+{mission.points} pts</Text>
-                    
-                    {isActive ? (
-                       <View className="bg-teal-100 px-3 py-1.5 rounded-lg">
-                        <Text className="text-teal-600 text-xs font-bold">Em Andamento</Text>
+                    {isLocked && !isCompleted && (
+                      <View className="bg-gray-200 px-3 py-1.5 rounded-lg">
+                        <Text className="text-gray-500 text-xs font-bold">Bloqueada</Text>
                       </View>
-                    ) : (
-                      <TouchableOpacity 
-                        onPress={() => handleAcceptMission(mission)}
+                    )}
+                    {!isLocked && !isActive && !isCompleted && (
+                      <TouchableOpacity
+                        onPress={() => handleAccept(mission.id, mission.title)}
                         className="bg-teal-500 px-3 py-1.5 rounded-lg shadow-sm active:scale-95"
                       >
                         <Text className="text-white text-xs font-bold">Aceitar</Text>
                       </TouchableOpacity>
                     )}
+                    {isActive && !isCompleted && (
+                      mission.progress >= mission.target ? (
+                        <TouchableOpacity
+                          onPress={() => handleComplete(mission.id)}
+                          className="bg-green-500 px-3 py-1.5 rounded-lg shadow-sm active:scale-95"
+                        >
+                          <Text className="text-white text-xs font-bold">Concluir</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => handleProgress(mission.id, mission.title)}
+                          className="bg-teal-500 px-3 py-1.5 rounded-lg shadow-sm active:scale-95"
+                        >
+                          <Text className="text-white text-xs font-bold">+1 Passo</Text>
+                        </TouchableOpacity>
+                      )
+                    )}
+                    {isCompleted && (
+                      <View className="bg-green-100 px-3 py-1.5 rounded-lg">
+                        <Text className="text-green-600 text-xs font-bold">Concluída</Text>
+                      </View>
+                    )}
                   </View>
+                  {isActive && (
+                    <View className="mt-2">
+                      <View className="bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <View
+                          className="bg-teal-500 h-full"
+                          style={{ width: `${(mission.progress / mission.target) * 100}%` }}
+                        />
+                      </View>
+                      <Text className="text-[10px] text-gray-500 mt-1 font-bold">Progresso: {mission.progress}/{mission.target}</Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </GlassCard>

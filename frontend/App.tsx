@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BottomTabNavigator } from './navigation/BottomTabNavigator';
 import { LoginScreen } from './screens/LoginScreen';
 import { RegisterScreen } from './screens/RegisterScreen';
+import { useUserStore } from './store/userStore';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +19,6 @@ export default function App() {
     Nunito: Nunito_400Regular,   // Mapping 'Nunito' to Regular
     // We can map specific weights if needed, but for now let's keep it simple as NativeWind uses font-family names
   });
-
   if (!fontsLoaded) {
     return null;
   }
