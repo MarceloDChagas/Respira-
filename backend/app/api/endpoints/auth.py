@@ -29,14 +29,22 @@ class Token(BaseModel):
     token_type: str
     name: Optional[str] = None
 
-# Mock Database
-users_db = {}
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
     return pwd_context.hash(password)
+
+# Mock Database
+users_db = {
+    "daniel@gmail.com": {
+        "name": "Daniel",
+        "email": "daniel@gmail.com",
+        "hashed_password": get_password_hash("daniel123")
+    }
+}
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
